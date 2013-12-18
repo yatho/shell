@@ -31,32 +31,38 @@ int main(int argc, char** argv)
 		sprintf(str, "\n{myshell}%s@%s:%s$ ", infos->pw_name, hostname, workingdirectory);
 		readlineptr = readline(str);
 
-		tampon = (char *)malloc((strlen(readlineptr) + 1) * sizeof(char));
-		if (tampon == NULL) {
-			exit(-1);
+		if (strstr(readlineptr, "exit") != NULL) {
+			ret = MYSHELL_FCT_EXIT;
 		}
+		else {
 
-		strcpy(tampon, readlineptr);
-		add_history(tampon);
+			tampon = (char *)malloc((strlen(readlineptr) + 1) * sizeof(char));
+			if (tampon == NULL) {
+				exit(-1);
+			}
 
-		//..........
-		parse_membres(readlineptr, &mycmd); 
-		parse_args(&mycmd);
-		parse_redirection(&mycmd);
-		exec_commande(&mycmd);
-		//.......... 
+			strcpy(tampon, readlineptr);
+			add_history(tampon);
 
-		//aff_membres(&mycmd);
-		//aff_args(&mycmd);
-		//aff_redirection(&mycmd);
+			//..........
+			parse_membres(readlineptr, &mycmd); 
+			parse_args(&mycmd);
+			parse_redirection(&mycmd);
+			exec_commande(&mycmd);
+			//.......... 
+
+			//aff_membres(&mycmd);
+			//aff_args(&mycmd);
+			//aff_redirection(&mycmd);
 
 		
-		free(readlineptr);
-		free_membres(&mycmd);
-		free_args(&mycmd);
-		free_redirection(&mycmd);
+			free(readlineptr);
+			free_membres(&mycmd);
+			free_args(&mycmd);
+			free_redirection(&mycmd);
 		
-		//..........
+			//..........
+		}
 		
 	}
 	clear_history();

@@ -246,7 +246,7 @@ void parse_redirection(cmd *c) {
 			strcpy(c->redirection[i][STDIN], decoupChaine);
 		}
 
-		else if ((tampon = strstr(c->cmd_membres[i], "2>>")) != NULL) {
+		if ((tampon = strstr(c->cmd_membres[i], "2>>")) != NULL) {
 			c->type_redirection[i][STDERR] = APPEND;
 			decoupChaine = strtok(++tampon, " >");
 
@@ -270,7 +270,7 @@ void parse_redirection(cmd *c) {
 			strcpy(c->redirection[i][STDERR], decoupChaine);
 		}
 
-		else if ((tampon = strstr(c->cmd_membres[i], ">>")) != NULL) {
+		if ((tampon = strstr(c->cmd_membres[i], ">>")) != NULL) {
 			c->type_redirection[i][STDOUT] = APPEND;
 			decoupChaine = strtok(tampon, " >");
 
