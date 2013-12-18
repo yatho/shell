@@ -68,6 +68,8 @@ void parse_args(cmd * c) {
 	int i;
 
 	/*Initialisation*/
+	init_serveurs(c);
+
 	c->cmd_args = (char ***)malloc(c->nb_cmd_membres * sizeof(char **));
 	if (c->cmd_args == NULL) {
 		exit(-1);
@@ -92,68 +94,76 @@ void parse_args(cmd * c) {
 		}
 
 		strcpy(tamponMembre, c->cmd_membres[i]);
-		decoupChaine = strtok(tamponMembre, " 2");
+		decoupChaine = strtok(tamponMembre, " ");
 
 		while ((decoupChaine != NULL) && (strchr(decoupChaine, '<') != decoupChaine) && (strchr(decoupChaine, '>') != decoupChaine) && (strstr(decoupChaine, "2>") != decoupChaine)) {
-			tampon = (char **)realloc(c->cmd_args[i], (c->nb_args[i] + 1) * sizeof(char *));
-			if (tampon == NULL) {
-				exit(-1);
+			
+			if (strstr(decoupChaine, "s:") != NULL) {
+				parse_serveurs(c, i, decoupChaine);	
 			}
 
-			c->cmd_args[i] = tampon;
-
-			if ((finChaine = strchr(decoupChaine, '<')) != NULL) {
-				chaineTemp = (char *)malloc((finChaine - decoupChaine + 1) * sizeof(char));
-				strncpy(chaineTemp, decoupChaine, (finChaine - decoupChaine));
-				chaineTemp[finChaine - decoupChaine] = '\0';
-
-				c->cmd_args[i][c->nb_args[i]] = (char *)malloc((strlen(chaineTemp) + 1) * sizeof(char));
-				if (c->cmd_args[i][c->nb_args[i]] == NULL) {
+			else {
+				tampon = (char **)realloc(c->cmd_args[i], (c->nb_args[i] + 1) * sizeof(char *));
+				if (tampon == NULL) {
 					exit(-1);
 				}
-			
-				strcpy(c->cmd_args[i][c->nb_args[i]], chaineTemp);
-				free(chaineTemp);
-			}
-			
-			else if ((finChaine = strchr(decoupChaine, '>')) != NULL) {
-				chaineTemp = (char *)malloc((finChaine - decoupChaine + 1) * sizeof(char));
-				strncpy(chaineTemp, decoupChaine, (finChaine - decoupChaine));
-				chaineTemp[finChaine - decoupChaine] = '\0';
 
-				c->cmd_args[i][c->nb_args[i]] = (char *)malloc((strlen(chaineTemp) + 1) * sizeof(char));
-				if (c->cmd_args[i][c->nb_args[i]] == NULL) {
-					exit(-1);
+				c->cmd_args[i] = tampon;
+
+				if ((finChaine = strchr(decoupChaine, '<')) != NULL) {
+					chaineTemp = (char *)malloc((finChaine - decoupChaine + 1) * sizeof(char));
+					strncpy(chaineTemp, decoupChaine, (finChaine - decoupChaine));
+					chaineTemp[finChaine - decoupChaine] = '\0';
+
+					c->cmd_args[i][c->nb_args[i]] = (char *)malloc((strlen(chaineTemp) + 1) * sizeof(char));
+					if (c->cmd_args[i][c->nb_args[i]] == NULL) {
+						exit(-1);
+					}
+			
+					strcpy(c->cmd_args[i][c->nb_args[i]], chaineTemp);
+					free(chaineTemp);
 				}
 			
-				strcpy(c->cmd_args[i][c->nb_args[i]], chaineTemp);
-				free(chaineTemp);
-			}
+				else if ((finChaine = strchr(decoupChaine, '>')) != NULL) {
+					chaineTemp = (char *)malloc((finChaine - decoupChaine + 1) * sizeof(char));
+					strncpy(chaineTemp, decoupChaine, (finChaine - decoupChaine));
+					chaineTemp[finChaine - decoupChaine] = '\0';
 
-			else if ((finChaine = strstr(decoupChaine, "2>")) != NULL) {
-				chaineTemp = (char *)malloc((finChaine - decoupChaine + 1) * sizeof(char));
-				strncpy(chaineTemp, decoupChaine, (finChaine - decoupChaine));
-				chaineTemp[finChaine - decoupChaine] = '\0';
-
-				c->cmd_args[i][c->nb_args[i]] = (char *)malloc((strlen(chaineTemp) + 1) * sizeof(char));
-				if (c->cmd_args[i][c->nb_args[i]] == NULL) {
-					exit(-1);
-				}
+					c->cmd_args[i][c->nb_args[i]] = (char *)malloc((strlen(chaineTemp) + 1) * sizeof(char));
+					if (c->cmd_args[i][c->nb_args[i]] == NULL) {
+						exit(-1);
+					}
 			
-				strcpy(c->cmd_args[i][c->nb_args[i]], chaineTemp);
-				free(chaineTemp);
-			}
-
-			else {			
-				c->cmd_args[i][c->nb_args[i]] = (char *)malloc((strlen(decoupChaine) + 1) * sizeof(char));
-				if (c->cmd_args[i][c->nb_args[i]] == NULL) {
-					exit(-1);
+					strcpy(c->cmd_args[i][c->nb_args[i]], chaineTemp);
+					free(chaineTemp);
 				}
+
+				else if ((finChaine = strstr(decoupChaine, "2>")) != NULL) {
+					chaineTemp = (char *)malloc((finChaine - decoupChaine + 1) * sizeof(char));
+					strncpy(chaineTemp, decoupChaine, (finChaine - decoupChaine));
+					chaineTemp[finChaine - decoupChaine] = '\0';
+
+					c->cmd_args[i][c->nb_args[i]] = (char *)malloc((strlen(chaineTemp) + 1) * sizeof(char));
+					if (c->cmd_args[i][c->nb_args[i]] == NULL) {
+						exit(-1);
+					}
 			
-				strcpy(c->cmd_args[i][c->nb_args[i]], decoupChaine);
+					strcpy(c->cmd_args[i][c->nb_args[i]], chaineTemp);
+					free(chaineTemp);
+				}
+
+				else {			
+					c->cmd_args[i][c->nb_args[i]] = (char *)malloc((strlen(decoupChaine) + 1) * sizeof(char));
+					if (c->cmd_args[i][c->nb_args[i]] == NULL) {
+						exit(-1);
+					}
+			
+					strcpy(c->cmd_args[i][c->nb_args[i]], decoupChaine);
+				}
+
+				c->nb_args[i]++;
 			}
 
-			c->nb_args[i]++;
 			decoupChaine = strtok(NULL, " ");
 		}
 
@@ -196,6 +206,7 @@ void free_args(cmd * c) {
 
 	free(c->cmd_args);
 	free(c->nb_args);
+	free_serveurs(c);
 }
 
 /*Fonctions pour les redirections*/
@@ -246,7 +257,7 @@ void parse_redirection(cmd *c) {
 			strcpy(c->redirection[i][STDIN], decoupChaine);
 		}
 
-		if ((tampon = strstr(c->cmd_membres[i], "2>>")) != NULL) {
+		else if ((tampon = strstr(c->cmd_membres[i], "2>>")) != NULL) {
 			c->type_redirection[i][STDERR] = APPEND;
 			decoupChaine = strtok(++tampon, " >");
 
@@ -270,7 +281,7 @@ void parse_redirection(cmd *c) {
 			strcpy(c->redirection[i][STDERR], decoupChaine);
 		}
 
-		if ((tampon = strstr(c->cmd_membres[i], ">>")) != NULL) {
+		else if ((tampon = strstr(c->cmd_membres[i], ">>")) != NULL) {
 			c->type_redirection[i][STDOUT] = APPEND;
 			decoupChaine = strtok(tampon, " >");
 
@@ -342,4 +353,50 @@ void aff_redirection(cmd * c) {
 		}
 		printf("\n");
 	}
+}
+
+
+/*Fonctions pour le serveur*/
+void init_serveurs(cmd * c) {
+	unsigned int i;
+
+	c->liste_serveurs = (serveur *)malloc(c->nb_cmd_membres * sizeof(serveur));
+	if (c->liste_serveurs == NULL) {
+		exit(-1);
+	}
+
+	for (i = 0; i < c->nb_cmd_membres; i++) {
+		(c->liste_serveurs[i]).adresseIP = NULL;
+		(c->liste_serveurs[i]).numPort = -1;
+	}
+}
+
+
+void parse_serveurs(cmd * c, unsigned int position, char * chaine) {
+	char * position1, * position2;
+
+	position1 = strchr(chaine, ':');
+	position2 = strrchr(chaine, ':');
+	position1++;
+	
+	(c->liste_serveurs[position]).adresseIP = (char *)malloc((position2 - position1 + 1) * sizeof(char));
+	if ((c->liste_serveurs[position]).adresseIP == NULL) {
+		exit(-1);
+	}
+
+	strncat((c->liste_serveurs[position]).adresseIP, position1, (position2 - position1));
+
+	position2++;
+	(c->liste_serveurs[position]).numPort = atoi(position2);
+}
+
+
+void free_serveurs(cmd * c) {
+	int i;
+	
+	for (i = 0; i < c->nb_cmd_membres; i++) {
+		free((c->liste_serveurs[i]).adresseIP);
+	}
+
+	free(c->liste_serveurs);
 }

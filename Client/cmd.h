@@ -8,12 +8,20 @@
 #define APPEND 3
 #define OVERWRITE 4
 
+
+typedef struct _serveur {
+	int numPort;
+	char * adresseIP;
+} serveur;
+
+
 typedef struct commande {
 	char * cmd_initiale;				/* La chaine initiale tapee par l'utilisateur */
 	char ** cmd_membres;				/* a chaque case i chaine du membre i */
 	unsigned int nb_cmd_membres;	/* Nombre de membres */
 	char *** cmd_args;				/* cmd_args[i][j] contient le jieme mot du ieme membre */
 	unsigned int * nb_args;			/* Nombre d'arguments par membres */
+	serveur * liste_serveurs;		/* S'il y a pas de serveur, on y met NULL*/
 	char *** redirection;			/* Pour stocker le chemin vers le fichier de redirection */
 	int ** type_redirection;			/* Pour stocker le type de redirection */
 } cmd;
@@ -27,5 +35,8 @@ void free_membres(cmd *ma_cmd);
 void parse_redirection(cmd *c);  //Remplit les champs redirection et type_redirection du membre i
 void free_redirection(cmd *c);
 void aff_redirection(cmd * c);
+void init_serveurs(cmd * c); //Initialisation de la liste des serveurs
+void parse_serveurs(cmd * c, unsigned int position, char * chaine); //Ajout d'un serveur dans la liste à une position donnée
+void free_serveurs(cmd * c);
 
 #endif

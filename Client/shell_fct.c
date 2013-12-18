@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include "shell_fct.h"
 
@@ -160,4 +164,39 @@ int exec_commande(cmd* ma_cmd) {
 	}
 	
 	return 0;
+}
+
+
+void exec_commande_serveur(cmd * c, unsigned int position, int * tube) {
+	int sockFd, taille;
+	struct sockaddr_in adresse;
+
+	sockFd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockFd == -1) {
+		perror("Erreur dans socket()");
+		exit(-1);
+	}
+
+	adresse.sin_family = AF_INET;
+	inet_aton((c->liste_serveurs[position]).adresseIP, (struct in_addr *)&(adresse.sin_addr.s_addr));
+	adresse.sin_port = htons((c->liste_serveurs[position]).numPort);
+
+	taille = sizeof(adresse);
+	
+	if (connect(sockFd, (struct sockaddr *)&adresse, taille) == -1) {
+		perror("Erreur dans connect()");
+		exit(-1);
+	}
+
+	//Faire travail de la socket
+	if (send(sockFd, c->liste_serveurs[position], sizeof(serveur), MSG_DONTROUTE) == -1) {
+		perror("Erreur dans send()");
+		exit(-1);
+	}
+
+	//Récupérer les données finales
+//	if (recv(sockFd, 
+
+
+	close(sockFd);
 }
