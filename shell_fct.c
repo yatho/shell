@@ -12,7 +12,7 @@ void timeOut(int sigNum) {
 }
 
 int exec_commande(cmd* ma_cmd) {
-	int status, i, j;
+	int status, i;
 	int fdIn, fdOut, fdErr;
 	unsigned int position = ma_cmd->nb_cmd_membres - 1;
 	pid_t numPidCmd;
