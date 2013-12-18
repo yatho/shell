@@ -169,6 +169,7 @@ int exec_commande(cmd* ma_cmd) {
 
 void exec_commande_serveur(cmd * c, unsigned int position, int * tube) {
 	int sockFd, taille;
+//	char * buf;
 	struct sockaddr_in adresse;
 
 	sockFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -189,13 +190,18 @@ void exec_commande_serveur(cmd * c, unsigned int position, int * tube) {
 	}
 
 	//Faire travail de la socket
-	if (send(sockFd, c->liste_serveurs[position], sizeof(serveur), MSG_DONTROUTE) == -1) {
+	//envoie du nombre d'arguments de la commande a effectuer sur le serveur.
+	if (send(sockFd, (int *)(&(c->nb_args[position])), sizeof(int), MSG_DONTROUTE) == -1) {
+		
+	}
+	// envoie les arguments de la commande à effectuer sur le serveur.
+/*	if (send(sockFd, c->cmd_args[position], sizeof(char**), MSG_DONTROUTE) == -1) {
 		perror("Erreur dans send()");
 		exit(-1);
-	}
+	}*/
 
 	//Récupérer les données finales
-//	if (recv(sockFd, 
+//	if (recv(sockFd, (char*)buf, , 0)) 
 
 
 	close(sockFd);
