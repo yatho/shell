@@ -1,6 +1,6 @@
 CC=gcc
 LIBS=-lreadline -lpthread
-EXEC=myshell
+EXEC=serveur
 all:$(EXEC)
 CCFLAGS=-g -Wall
 

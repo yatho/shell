@@ -385,6 +385,7 @@ void parse_serveurs(cmd * c, unsigned int position, char * chaine) {
 	}
 
 	strncat((c->liste_serveurs[position]).adresseIP, position1, (position2 - position1));
+printf("IP = %s", (c->liste_serveurs[position]).adresseIP);
 
 	position2++;
 	(c->liste_serveurs[position]).numPort = atoi(position2);
