@@ -49,7 +49,6 @@ static void exec_commande_serveur(cmd * c, unsigned int position, int * tube) {
 	for (i = 0; c->cmd_args[position][i] != NULL; i++) {
 		memset(buffer, '\0', 1024);
 		strcpy(buffer, c->cmd_args[position][i]);
-		printf("%s\n", buffer);
 
 		long_Chaine = strlen(c->cmd_args[position][i]);
 		if (send(sockFd, (int *)&long_Chaine, sizeof(int), 0) == -1) {
@@ -61,8 +60,6 @@ static void exec_commande_serveur(cmd * c, unsigned int position, int * tube) {
 			perror("Erreur dans send()");
 			exit(-1);
 		}
-		
-		printf("%d\n", nbOctets);
 	}
 
 	//Récupérer les données finales
