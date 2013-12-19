@@ -47,8 +47,8 @@ int main(int argc, char** argv)
 			//..........
 			parse_membres(readlineptr, &mycmd); 
 			parse_args(&mycmd);
-			//parse_redirection(&mycmd);
-			//exec_commande(&mycmd);
+			parse_redirection(&mycmd);
+			exec_commande(&mycmd);
 			//.......... 
 
 			//aff_membres(&mycmd);
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 			free(readlineptr);
 			free_membres(&mycmd);
 			free_args(&mycmd);
-			//free_redirection(&mycmd);
+			free_redirection(&mycmd);
 		
 			//..........
 		}

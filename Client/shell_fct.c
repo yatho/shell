@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
@@ -14,6 +15,63 @@ pid_t numProcessCmd;
 void timeOut(int sigNum) {
 	kill(numProcessCmd, SIGKILL);
 }
+
+
+static void exec_commande_serveur(cmd * c, unsigned int position, int * tube) {
+	int sockFd, taille, i, nbOctets, long_Chaine;
+	char buffer[1024];
+	struct sockaddr_in adresse;
+
+	sockFd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockFd == -1) {
+		perror("Erreur dans socket()");
+		exit(-1);
+	}
+
+	adresse.sin_family = AF_INET;
+	inet_aton((c->liste_serveurs[position]).adresseIP, (struct in_addr *)&(adresse.sin_addr.s_addr));
+	adresse.sin_port = htons((c->liste_serveurs[position]).numPort);
+
+	taille = sizeof(adresse);
+	
+	if (connect(sockFd, (struct sockaddr *)&adresse, taille) == -1) {
+		perror("Erreur dans connect()");
+		exit(-1);
+	}
+
+	//Faire travail de la socket
+	//envoie du nombre d'arguments de la commande a effectuer sur le serveur.
+	if (send(sockFd, (int *)(&(c->nb_args[position])), sizeof(int), 0) == -1) {
+		perror("Erreur dans send()");
+		exit(-1);
+	}
+
+	for (i = 0; c->cmd_args[position][i] != NULL; i++) {
+		memset(buffer, '\0', 1024);
+		strcpy(buffer, c->cmd_args[position][i]);
+		printf("%s\n", buffer);
+
+		long_Chaine = strlen(c->cmd_args[position][i]);
+		if (send(sockFd, (int *)&long_Chaine, sizeof(int), 0) == -1) {
+			perror("Erreur dans send()");
+			exit(-1);
+		}
+
+		if ((nbOctets = send(sockFd, (char *)buffer, strlen(c->cmd_args[position][i]), 0)) == -1) {
+			perror("Erreur dans send()");
+			exit(-1);
+		}
+		
+		printf("%d\n", nbOctets);
+	}
+
+	//Récupérer les données finales
+//	if (recv(sockFd, (char*)buf, , 0)) 
+
+
+	close(sockFd);
+}
+
 
 int exec_commande(cmd* ma_cmd) {
 	int status, i;
@@ -101,7 +159,12 @@ int exec_commande(cmd* ma_cmd) {
 					dup(fdOut);
 				}
 
-				execvp(ma_cmd->cmd_args[i][0], ma_cmd->cmd_args[i]);
+				if ((ma_cmd->liste_serveurs[i]).adresseIP != NULL) {
+					exec_commande_serveur(ma_cmd, i, tabTube[0]);
+				}
+				else {
+					execvp(ma_cmd->cmd_args[i][0], ma_cmd->cmd_args[i]);
+				}
 
 				if (i > 0) {
 					if (i % 2 == 1) {
@@ -167,42 +230,6 @@ int exec_commande(cmd* ma_cmd) {
 }
 
 
-void exec_commande_serveur(cmd * c, unsigned int position, int * tube) {
-	int sockFd, taille;
-//	char * buf;
-	struct sockaddr_in adresse;
-
-	sockFd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockFd == -1) {
-		perror("Erreur dans socket()");
-		exit(-1);
-	}
-
-	adresse.sin_family = AF_INET;
-	inet_aton((c->liste_serveurs[position]).adresseIP, (struct in_addr *)&(adresse.sin_addr.s_addr));
-	adresse.sin_port = htons((c->liste_serveurs[position]).numPort);
-
-	taille = sizeof(adresse);
-	
-	if (connect(sockFd, (struct sockaddr *)&adresse, taille) == -1) {
-		perror("Erreur dans connect()");
-		exit(-1);
-	}
-
-	//Faire travail de la socket
-	//envoie du nombre d'arguments de la commande a effectuer sur le serveur.
-	if (send(sockFd, (int *)(&(c->nb_args[position])), sizeof(int), MSG_DONTROUTE) == -1) {
-		
-	}
-	// envoie les arguments de la commande à effectuer sur le serveur.
-/*	if (send(sockFd, c->cmd_args[position], sizeof(char**), MSG_DONTROUTE) == -1) {
-		perror("Erreur dans send()");
-		exit(-1);
-	}*/
-
-	//Récupérer les données finales
-//	if (recv(sockFd, (char*)buf, , 0)) 
 
 
-	close(sockFd);
-}
+

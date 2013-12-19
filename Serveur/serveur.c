@@ -14,7 +14,6 @@ int main(int argc, char * argv[]) {
 	int taille;
 	int nombre;//nombre d'arguments à envoyer
 	int i;
-	//char buffer[1024];
 	int tailleArgs;
 	char ** args;
 
@@ -59,11 +58,16 @@ int main(int argc, char * argv[]) {
 			}
 			printf("Taille = %d\t",tailleArgs);
 			args[i] = (char*)malloc(sizeof(char)*(tailleArgs+1));
+			if(args[i] == NULL)
+			{
+				perror("Erreur d'allocation");
+				exit(-1);
+			}
 			if (recv(fdSocket, (char*)args[i], tailleArgs,0) == -1) {
 				perror("Erreur dans send()");
 				exit(-1);
 			}
-			args[tailleArgs] = '\0';
+			args[i][tailleArgs] = '\0';
 			printf("args[%d] = %s\n", i, args[i]);
 		}
 		args[nombre] = NULL;
