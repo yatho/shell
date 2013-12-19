@@ -11,23 +11,24 @@ int main(int argc, char * argv[]) {
 	int idSocket;
 	int fdSocket;
 	int taille;
-	int nombre;
+	int nombre;//nombre d'arguments à envoyer
 
+//Partie correct
 	idSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (idSocket == -1) {
 		perror("Erreur dans socket()");
 		exit(-1);
 	}
-
-	SockAdr.sin_family = AF_UNIX;
-	SockAdr.sin_port = htons(1234);
+//à voir
+	SockAdr.sin_family = AF_INET;
+	SockAdr.sin_port = htons(8080);// numéro de port d'accès du serveur
 	SockAdr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	if (bind(idSocket, &SockAdr, sizeof(SockAdr)) == -1) {
+//Partie correct
+	if (bind(idSocket, (struct sockaddr *)&SockAdr, sizeof(SockAdr)) == -1) {
 		perror("Erreur dans bind()");
 		exit(-1);
 	}
-
+//Partie correct
 	if (listen(idSocket, 10) == -1) {
 		perror("Erreur dans listen()");
 		exit(-1);
@@ -35,7 +36,7 @@ int main(int argc, char * argv[]) {
 
 	while (1) {
 		taille = sizeof(struct sockaddr_in);
-		fdSocket = accept(idSocket, &SockAdr, &taille);
+		fdSocket = accept(idSocket, (struct sockaddr *)&SockAdr, (socklen_t *)&taille);
 		if(recv(fdSocket, &nombre, sizeof(int),0) == -1) {
 			perror("Erreur dans send()");
 			exit(-1);
