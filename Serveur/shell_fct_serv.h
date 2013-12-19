@@ -6,4 +6,4 @@
 #define MYSHELL_CMD_OK 100
 #define MYSHELL_FCT_EXIT 101
 
-int exec_commande(/*cmd* ma_cmd*/);
+int exec_commande(char ** args);

@@ -6,6 +6,16 @@
 #include <signal.h>
 #include <netinet/in.h>
 #include <string.h>
+#include "shell_fct_serv.h"
+
+void free_args(char ** args, int nombre)
+{
+	int i;
+	for(i=0; i< nombre;i++)
+		free(args[i]);
+	free(args);
+}
+
 
 int main(int argc, char * argv[]) {
 	struct sockaddr_in SockAdr;
@@ -45,18 +55,18 @@ int main(int argc, char * argv[]) {
 			perror("Erreur dans send()");
 			exit(-1);
 		}
-		printf("nombre == %d \n",nombre);
+		//printf("nombre == %d \n",nombre);
 
 		//allocation du nombre d'arguments
 		args = (char**) malloc(sizeof(char*)*(nombre+1));
 //récupération des arguments a effectuer
 		for(i=0;i<nombre;i++) {
-			printf("i = %d\n",i);
+			//printf("i = %d\n",i);
 			if (recv(fdSocket, &tailleArgs, sizeof(int),0) == -1) {
 				perror("Erreur dans send()");
 				exit(-1);
 			}
-			printf("Taille = %d\t",tailleArgs);
+			//printf("Taille = %d\t",tailleArgs);
 			args[i] = (char*)malloc(sizeof(char)*(tailleArgs+1));
 			if(args[i] == NULL)
 			{
@@ -68,9 +78,11 @@ int main(int argc, char * argv[]) {
 				exit(-1);
 			}
 			args[i][tailleArgs] = '\0';
-			printf("args[%d] = %s\n", i, args[i]);
+			//printf("args[%d] = %s\n", i, args[i]);
 		}
 		args[nombre] = NULL;
+		exec_commande(args);
+		free_args(args, nombre);
 	}
 
 	close(idSocket);
