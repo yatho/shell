@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <limits.h>
 #include "shell_fct.h"
 
 pid_t numProcessCmd;
@@ -20,6 +21,7 @@ void timeOut(int sigNum) {
 static void exec_commande_serveur(cmd * c, unsigned int position, int * tube) {
 	int sockFd, taille, i, nbOctets, long_Chaine;
 	char buffer[1024];
+	char bufferPipe[PIPE_BUF];
 	struct sockaddr_in adresse;
 
 	sockFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -62,8 +64,21 @@ static void exec_commande_serveur(cmd * c, unsigned int position, int * tube) {
 		}
 	}
 
+	memset(bufferPipe, '\0', PIPE_BUF);
 	//Récupérer les données finales
-//	if (recv(sockFd, (char*)buf, , 0)) 
+	if (recv(sockFd, (char*)bufferPipe, sizeof(char) * PIPE_BUF, 0) == -1) {
+		perror("Erreur dans recv()");
+		exit(-1);
+	}
+
+	if (tube == NULL) {
+		printf("%s", bufferPipe);
+	}
+	else {
+		close(1);
+		dup(tube[1]);
+		write(tube[1], bufferPipe, PIPE_BUF);
+	}	
 
 
 	close(sockFd);
@@ -157,7 +172,12 @@ int exec_commande(cmd* ma_cmd) {
 				}
 
 				if ((ma_cmd->liste_serveurs[i]).adresseIP != NULL) {
-					exec_commande_serveur(ma_cmd, i, tabTube[0]);
+					if (position == 0) {
+						exec_commande_serveur(ma_cmd, i, NULL);
+					}
+					else {
+						exec_commande_serveur(ma_cmd, i, tabTube[0]);
+					}
 				}
 				else {
 					execvp(ma_cmd->cmd_args[i][0], ma_cmd->cmd_args[i]);

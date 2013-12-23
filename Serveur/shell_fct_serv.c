@@ -14,19 +14,24 @@ pid_t numProcessCmd;
 void timeOut(int sigNum) {
 	kill(numProcessCmd, SIGKILL);
 }
-/*A modifier*/
-int exec_commande(char ** args) {
+
+int exec_commande(char ** args, int * tube) {
 	int status;
 
+	pipe(tube);
 	numProcessCmd = fork();
 	if (numProcessCmd == 0) {
+		close(1);
+		dup(tube[1]);
 		execvp(args[0], args);
+		close(tube[1]);
 		exit(0);
 	}
 	else {
 		signal(SIGALRM, timeOut);
 		alarm(10);
 		waitpid(numProcessCmd, &status, 0);
+		close(tube[1]);
 	}
 	return 0;
 }
