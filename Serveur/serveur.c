@@ -121,8 +121,7 @@ int main(int argc, char * argv[]) {
 		
 		status = pthread_attr_init(&attr);
 		status = pthread_create(&thread_id, &attr, &thread_start, &fdSocket);
-		status = pthread_attr_destroy(&attr);
-		status = pthread_join(thread_id, &res);
+		status = pthread_detach(thread_id);
 	}
 
 	close(idSocket);
