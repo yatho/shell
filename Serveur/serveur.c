@@ -84,10 +84,8 @@ int main(int argc, char * argv[]) {
 	int idSocket;
 	int fdSocket;
 	int taille;
-	int status;
 	pthread_t thread_id;
 	pthread_attr_t attr;
-	void * res;
 
 	if (argc < 2) {
 		perror("Erreur dans le nombre d'arguments.");
@@ -119,9 +117,9 @@ int main(int argc, char * argv[]) {
 		taille = sizeof(struct sockaddr_in);
 		fdSocket = accept(idSocket, (struct sockaddr *)&SockAdr, (socklen_t *)&taille);
 		
-		status = pthread_attr_init(&attr);
-		status = pthread_create(&thread_id, &attr, &thread_start, &fdSocket);
-		status = pthread_detach(thread_id);
+		pthread_attr_init(&attr);
+		pthread_create(&thread_id, &attr, &thread_start, &fdSocket);
+		pthread_detach(thread_id);
 	}
 
 	close(idSocket);
