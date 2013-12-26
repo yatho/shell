@@ -18,6 +18,7 @@ int main(int argc, char** argv)
 	char str[1024];
 	char hostname[256];
 	char workingdirectory[256];
+	rl_bind_key ('\t', rl_complete);/*initialisation de l'auto complétion*/
 
 	using_history();
 
